@@ -10,6 +10,7 @@ class CPU:
         self.reg = [0] * 8 #8 bit
         self.pc = 0 #index or program counter
         self.ram = [0] * 256 #Memory
+        self.fl = 0b00000000 #for flags
 
     def load(self, progname):
         """Load a program into memory."""
@@ -55,6 +56,17 @@ class CPU:
             self.reg[reg_a] -= self.reg[reg_b]
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "CMP":
+            # print(self.reg[reg_a], self.reg[reg_b])
+            if self.reg[reg_a] < self.reg[reg_b]:
+                #LGE
+                self.fl= 0b00000100
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                self.fl= 0b00000010
+            elif self.reg[reg_a] == self.reg[reg_b]:
+                self.fl= 0b00000001
+
+
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -66,7 +78,7 @@ class CPU:
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
             self.pc,
-            #self.fl,
+            self.fl,
             #self.ie,
             self.ram_read(self.pc),
             self.ram_read(self.pc + 1),
@@ -117,8 +129,28 @@ class CPU:
                 self.reg[operand_a] = self.ram_read(sp)
                 sp +=1
                 self.pc += pc_inc
+            elif ir == 0b10100111 or ir == "CMP":
+                operand_a = self.ram_read(self.pc +1)
+                operand_b = self.ram_read(self.pc +2)
+                self.alu("CMP", operand_a, operand_b)
+                self.pc += pc_inc
             elif ir == 0b00000001 or ir == "HLT":
                 print("Exiting")
                 halted=True
+                sys.exit(1)
+            elif ir == 0b01010101 or ir == "JEQ":
+                if self.fl == 0b00000001:
+                    self.pc=self.reg[operand_a]
+                else:
+                    self.pc += pc_inc
+            elif ir == 0b01010100 or ir == "JMP":
+                self.pc=self.reg[operand_a]
+            elif ir == 0b01010110 or ir == "JNE":
+                if self.fl !=0b00000001:
+                    self.pc=self.reg[operand_a]
+                else:
+                    self.pc += pc_inc
+            else:
+                print(f"Unhandled: ", ir)
                 sys.exit(1)
         
