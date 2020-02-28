@@ -100,7 +100,6 @@ class CPU:
         """Run the CPU."""
         halted=False
         sp=255
-        # print("THE RAM",self.ram)
         while halted == False:
             # sp_reg=7 #highest reg most recently pushed
             ir=self.ram_read(self.pc) #READ THE CURRENT PC AND STORE VALUE
@@ -120,7 +119,7 @@ class CPU:
                 self.pc += pc_inc
             elif ir == 0b01000101 or ir == "PUSH":
                 sp -= 1 #decrement pointer
-                self.ram_write(self.reg[operand_a], sp) #self.ram?
+                self.ram_write(self.reg[operand_a], sp)
                 self.pc += pc_inc #increase CP by 2 bites
                 self.reg[operand_a]=self.ram[operand_a]
             elif ir == 0b01000110 or ir == "POP":
@@ -150,6 +149,16 @@ class CPU:
                     self.pc=self.reg[operand_a]
                 else:
                     self.pc += pc_inc
+            elif ir == 0b01010000 or ir == "CALL":
+                sp -= 1 #dec pointer
+                self.ram_write(self.pc + pc_inc, sp) #PUSH ON TO STACK
+                self.pc=self.reg[operand_a] #point to new address #CORRECT
+            elif ir == 0b00010001 or ir == "RET":
+                self.pc=self.ram_read(sp)
+                sp +=1
+            elif ir == 0b10100000 or ir == "ADD":
+                self.alu("ADD", operand_a, operand_b)
+                self.pc += pc_inc
             else:
                 print(f"Unhandled: ", ir)
                 sys.exit(1)
