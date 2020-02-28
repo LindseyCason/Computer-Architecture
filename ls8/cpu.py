@@ -87,8 +87,10 @@ class CPU:
     def run(self):
         """Run the CPU."""
         halted=False
+        sp=255
         # print("THE RAM",self.ram)
         while halted == False:
+            # sp_reg=7 #highest reg most recently pushed
             ir=self.ram_read(self.pc) #READ THE CURRENT PC AND STORE VALUE
             operand_a=self.ram_read(self.pc +1) #SAVE IN CASE NEEDED
             operand_b=self.ram_read(self.pc +2) #SAVE IN CASE NEEDED
@@ -98,11 +100,22 @@ class CPU:
                 self.reg[operand_a]= operand_b
                 self.pc+=pc_inc
             elif ir == 0b01000111 or ir == "PRN":
-                print(self.reg[operand_a])
+                # print(self.reg[operand_a])
                 print(int(f"{self.reg[operand_a]}",10))
                 self.pc +=pc_inc
             elif ir == 0b10100010 or ir == "MUL":
                 self.alu("MUL", operand_a, operand_b)
+                self.pc += pc_inc
+            elif ir == 0b01000101 or ir == "PUSH":
+                sp -= 1 #decrement pointer
+                self.ram_write(self.reg[operand_a], sp) #self.ram?
+                self.pc += pc_inc #increase CP by 2 bites
+                self.reg[operand_a]=self.ram[operand_a]
+            elif ir == 0b01000110 or ir == "POP":
+                ## #01000110 # POP R2
+                #-  00000010
+                self.reg[operand_a] = self.ram_read(sp)
+                sp +=1
                 self.pc += pc_inc
             elif ir == 0b00000001 or ir == "HLT":
                 print("Exiting")
