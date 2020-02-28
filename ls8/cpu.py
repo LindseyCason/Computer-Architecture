@@ -56,6 +56,10 @@ class CPU:
             self.reg[reg_a] -= self.reg[reg_b]
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "INC":
+            self.reg[reg_a] = self.reg[reg_a]+1
+        elif op == "DEC":
+            self.reg[reg_a] = self.reg[reg_a]-1
         elif op == "CMP":
             # print(self.reg[reg_a], self.reg[reg_b])
             if self.reg[reg_a] < self.reg[reg_b]:
@@ -65,8 +69,6 @@ class CPU:
                 self.fl= 0b00000010
             elif self.reg[reg_a] == self.reg[reg_b]:
                 self.fl= 0b00000001
-
-
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -110,6 +112,9 @@ class CPU:
             if ir == 0b10000010 or ir == "LDI": #130
                 self.reg[operand_a]= operand_b
                 self.pc+=pc_inc
+            elif ir == 0b10000011 or ir == "LD": #131
+                self.reg[operand_a]=[operand_b]
+                self.pc += pc_inc
             elif ir == 0b01000111 or ir == "PRN":
                 # print(self.reg[operand_a])
                 print(int(f"{self.reg[operand_a]}",10))
@@ -158,6 +163,21 @@ class CPU:
                 sp +=1
             elif ir == 0b10100000 or ir == "ADD":
                 self.alu("ADD", operand_a, operand_b)
+                self.pc += pc_inc
+            elif ir == 0b01001000 or ir == "PRA":
+                print(self.reg[operand_a])
+                # char=self.reg[operand_a] + 97
+                # print(chr(char))
+                # print(chr(char))
+                self.pc += pc_inc
+            elif ir == 0b01100101 or ir == "INC":
+                #TODO MOVE TO ALU
+                self.alu("INC", operand_a, operand_b)
+                print("IN INC",self.reg[operand_a])
+                self.pc += pc_inc
+            elif ir == 0b01100110 or ir == "DEC":
+                self.alu("DEC", operand_a, operand_b)
+                print("In Dec", self.reg[operand_a])
                 self.pc += pc_inc
             else:
                 print(f"Unhandled: ", ir)
