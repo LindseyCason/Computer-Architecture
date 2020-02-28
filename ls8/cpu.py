@@ -164,22 +164,23 @@ class CPU:
             elif ir == 0b10100000 or ir == "ADD":
                 self.alu("ADD", operand_a, operand_b)
                 self.pc += pc_inc
-            elif ir == 0b01001000 or ir == "PRA":
-                print(self.reg[operand_a])
-                # char=self.reg[operand_a] + 97
-                # print(chr(char))
-                # print(chr(char))
-                self.pc += pc_inc
-            elif ir == 0b01100101 or ir == "INC":
-                #TODO MOVE TO ALU
-                self.alu("INC", operand_a, operand_b)
-                print("IN INC",self.reg[operand_a])
-                self.pc += pc_inc
-            elif ir == 0b01100110 or ir == "DEC":
-                self.alu("DEC", operand_a, operand_b)
-                print("In Dec", self.reg[operand_a])
-                self.pc += pc_inc
+            # elif ir == 0b01001000 or ir == "PRA":
+            #     print(self.reg[operand_a])
+            #     # char=self.reg[operand_a] + 97
+            #     # print(chr(char))
+            #     # print(chr(char))
+            #     self.pc += pc_inc
+            # elif ir == 0b01100101 or ir == "INC":
+            #     #TODO MOVE TO ALU
+            #     self.alu("INC", operand_a, operand_b)
+            #     print("IN INC",self.reg[operand_a])
+            #     self.pc += pc_inc
+            # elif ir == 0b01100110 or ir == "DEC":
+            #     self.alu("DEC", operand_a, operand_b)
+            #     print("In Dec", self.reg[operand_a])
+            #     self.pc += pc_inc
             else:
-                print(f"Unhandled: ", ir)
+                code=(format(ir, "b"))
+                print(f"Unhandled Code: ", code)
                 sys.exit(1)
         
